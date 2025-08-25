@@ -43,7 +43,7 @@ ITEMS = [
     {
         'name': 'Gem',
         'color': (0, 255, 255),
-        'value': 50,
+        'value': 150,
         'image': load_item_image('gem.png'),
     },
     {
