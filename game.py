@@ -59,6 +59,8 @@ def main():
     last_spawn = pygame.time.get_ticks()
 
     font = pygame.font.Font(None, 36)
+    info_font = pygame.font.Font(None, 24)
+    sold_items = []
 
     while running:
         for event in pygame.event.get():
@@ -74,6 +76,9 @@ def main():
                 item = INVENTORY[dragged_index]
                 if SELL_AREA.colliderect(item['rect']):
                     total_money += item['value']
+                    sold_items.append((item['name'], item['value']))
+                    if len(sold_items) > 5:
+                        sold_items.pop(0)
                     INVENTORY[dragged_index] = None
                 else:
                     item['rect'].topleft = INVENTORY_SLOTS[dragged_index].topleft
@@ -96,12 +101,33 @@ def main():
         pygame.draw.rect(SCREEN, (150, 0, 0), SELL_AREA, 2)
         for slot in INVENTORY_SLOTS:
             pygame.draw.rect(SCREEN, (200, 200, 200), slot, 2)
+        mouse_pos = pygame.mouse.get_pos()
+        tooltip = None
+        tooltip_rect = None
         for item in INVENTORY:
             if item:
                 pygame.draw.rect(SCREEN, item['color'], item['rect'])
+                if item['rect'].collidepoint(mouse_pos):
+                    tooltip = info_font.render(f"{item['name']} - ${item['value']}", True, (255, 255, 255))
+                    tooltip_rect = tooltip.get_rect()
+                    tooltip_rect.topleft = (
+                        mouse_pos[0] + 10,
+                        mouse_pos[1] - tooltip_rect.height - 10,
+                    )
 
         total_text = font.render(f'Total: ${total_money}', True, (255, 255, 255))
         SCREEN.blit(total_text, (10, 10))
+
+        y_offset = 50
+        for name, value in reversed(sold_items):
+            sold_text = info_font.render(f"{name} - ${value}", True, (255, 255, 255))
+            SCREEN.blit(sold_text, (10, y_offset))
+            y_offset += 20
+
+        if tooltip:
+            background = tooltip_rect.inflate(4, 4)
+            pygame.draw.rect(SCREEN, (0, 0, 0), background)
+            SCREEN.blit(tooltip, tooltip_rect)
 
         pygame.display.flip()
         CLOCK.tick(60)
