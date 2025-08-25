@@ -49,7 +49,7 @@ ITEMS = [
     {
         'name': 'Sword Cutter',
         'color': (255, 105, 180),
-        'value': 50,
+        'value': 150,
         'image': load_item_image('swordcutter.png'),
     },
     {
