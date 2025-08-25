@@ -112,6 +112,7 @@ def spawn_item():
                 item = {
                     'name': 'Trash',
                     'is_trash': True,
+                    'value': -80,
                     'rect': INVENTORY_SLOTS[i].copy(),
                 }
             else:
@@ -145,20 +146,16 @@ def main():
                         break
             elif event.type == pygame.MOUSEBUTTONUP and dragged_index is not None:
                 item = INVENTORY[dragged_index]
-                if item.get('is_trash'):
-                    if TRASH_AREA.colliderect(item['rect']):
-                        INVENTORY[dragged_index] = None
-                    else:
-                        item['rect'].topleft = INVENTORY_SLOTS[dragged_index].topleft
+                if SELL_AREA.colliderect(item['rect']):
+                    total_money += item['value']
+                    sold_items.append((item['name'], item['value']))
+                    if len(sold_items) > 5:
+                        sold_items.pop(0)
+                    INVENTORY[dragged_index] = None
+                elif TRASH_AREA.colliderect(item['rect']):
+                    INVENTORY[dragged_index] = None
                 else:
-                    if SELL_AREA.colliderect(item['rect']):
-                        total_money += item['value']
-                        sold_items.append((item['name'], item['value']))
-                        if len(sold_items) > 5:
-                            sold_items.pop(0)
-                        INVENTORY[dragged_index] = None
-                    else:
-                        item['rect'].topleft = INVENTORY_SLOTS[dragged_index].topleft
+                    item['rect'].topleft = INVENTORY_SLOTS[dragged_index].topleft
                 dragged_index = None
 
         # Update dragged item position
