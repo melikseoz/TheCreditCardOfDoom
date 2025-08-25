@@ -17,21 +17,83 @@ ITEM_SPAWN_INTERVAL = 3000  # milliseconds
 INVENTORY_SIZE = 5
 ITEM_SIZE = 50
 
+# Asset handling
+ASSET_DIR = os.path.join(os.path.dirname(__file__), "images")
+
+
+def load_item_image(filename: str):
+    """Load and scale an item image if it exists."""
+    path = os.path.join(ASSET_DIR, filename)
+    if os.path.exists(path):
+        image = pygame.image.load(path).convert_alpha()
+        return pygame.transform.scale(image, (ITEM_SIZE, ITEM_SIZE))
+    return None
+
 # Define sell area
 SELL_AREA = pygame.Rect(WIDTH - 160, HEIGHT - 160, 150, 150)
 
 # Define 10 unique items
 ITEMS = [
-    {'name': 'Coin', 'color': (255, 215, 0), 'value': 10},
-    {'name': 'Gem', 'color': (0, 255, 255), 'value': 50},
-    {'name': 'Ring', 'color': (255, 105, 180), 'value': 30},
-    {'name': 'Potion', 'color': (148, 0, 211), 'value': 40},
-    {'name': 'Scroll', 'color': (210, 180, 140), 'value': 20},
-    {'name': 'Shield', 'color': (128, 128, 128), 'value': 60},
-    {'name': 'Sword', 'color': (192, 192, 192), 'value': 80},
-    {'name': 'Helmet', 'color': (105, 105, 105), 'value': 35},
-    {'name': 'Boots', 'color': (139, 69, 19), 'value': 25},
-    {'name': 'Amulet', 'color': (0, 191, 255), 'value': 45},
+    {
+        'name': 'Coin',
+        'color': (255, 215, 0),
+        'value': 10,
+        'image': load_item_image('coin.png'),
+    },
+    {
+        'name': 'Gem',
+        'color': (0, 255, 255),
+        'value': 50,
+        'image': load_item_image('gem.png'),
+    },
+    {
+        'name': 'Ring',
+        'color': (255, 105, 180),
+        'value': 30,
+        'image': load_item_image('ring.png'),
+    },
+    {
+        'name': 'Potion',
+        'color': (148, 0, 211),
+        'value': 40,
+        'image': load_item_image('potion.png'),
+    },
+    {
+        'name': 'Scroll',
+        'color': (210, 180, 140),
+        'value': 20,
+        'image': load_item_image('scroll.png'),
+    },
+    {
+        'name': 'Shield',
+        'color': (128, 128, 128),
+        'value': 60,
+        'image': load_item_image('shield.png'),
+    },
+    {
+        'name': 'Sword',
+        'color': (192, 192, 192),
+        'value': 80,
+        'image': load_item_image('sword.png'),
+    },
+    {
+        'name': 'Helmet',
+        'color': (105, 105, 105),
+        'value': 35,
+        'image': load_item_image('helmet.png'),
+    },
+    {
+        'name': 'Boots',
+        'color': (139, 69, 19),
+        'value': 25,
+        'image': load_item_image('boots.png'),
+    },
+    {
+        'name': 'Amulet',
+        'color': (0, 191, 255),
+        'value': 45,
+        'image': load_item_image('amulet.png'),
+    },
 ]
 
 # Inventory slots positions
@@ -106,9 +168,14 @@ def main():
         tooltip_rect = None
         for item in INVENTORY:
             if item:
-                pygame.draw.rect(SCREEN, item['color'], item['rect'])
+                if item.get('image'):
+                    SCREEN.blit(item['image'], item['rect'])
+                else:
+                    pygame.draw.rect(SCREEN, item['color'], item['rect'])
                 if item['rect'].collidepoint(mouse_pos):
-                    tooltip = info_font.render(f"{item['name']} - ${item['value']}", True, (255, 255, 255))
+                    tooltip = info_font.render(
+                        f"{item['name']} - ${item['value']}", True, (255, 255, 255)
+                    )
                     tooltip_rect = tooltip.get_rect()
                     tooltip_rect.topleft = (
                         mouse_pos[0] + 10,
