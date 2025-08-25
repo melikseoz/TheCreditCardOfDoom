@@ -47,10 +47,10 @@ ITEMS = [
         'image': load_item_image('gem.png'),
     },
     {
-        'name': 'Ring',
+        'name': 'Sword Cutter',
         'color': (255, 105, 180),
-        'value': 30,
-        'image': load_item_image('ring.png'),
+        'value': 50,
+        'image': load_item_image('swordcutter.png'),
     },
     {
         'name': 'Portal Potion',
