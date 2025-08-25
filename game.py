@@ -29,8 +29,9 @@ def load_item_image(filename: str):
         return pygame.transform.scale(image, (ITEM_SIZE, ITEM_SIZE))
     return None
 
-# Define sell area
+# Define interaction areas
 SELL_AREA = pygame.Rect(WIDTH - 160, HEIGHT - 160, 150, 150)
+TRASH_AREA = pygame.Rect(WIDTH - 160, 10, 150, 150)
 
 # Define 10 unique items
 ITEMS = [
@@ -104,11 +105,19 @@ INVENTORY_SLOTS = [
 INVENTORY = [None] * INVENTORY_SIZE
 
 def spawn_item():
-    """Add a random item to the first available inventory slot."""
+    """Add a random item (or trash) to the first available inventory slot."""
     for i in range(INVENTORY_SIZE):
         if INVENTORY[i] is None:
-            item = random.choice(ITEMS).copy()
-            item['rect'] = INVENTORY_SLOTS[i].copy()
+            if random.random() < 0.2:
+                item = {
+                    'name': 'Trash',
+                    'is_trash': True,
+                    'rect': INVENTORY_SLOTS[i].copy(),
+                }
+            else:
+                item = random.choice(ITEMS).copy()
+                item['is_trash'] = False
+                item['rect'] = INVENTORY_SLOTS[i].copy()
             INVENTORY[i] = item
             return
 
@@ -136,14 +145,20 @@ def main():
                         break
             elif event.type == pygame.MOUSEBUTTONUP and dragged_index is not None:
                 item = INVENTORY[dragged_index]
-                if SELL_AREA.colliderect(item['rect']):
-                    total_money += item['value']
-                    sold_items.append((item['name'], item['value']))
-                    if len(sold_items) > 5:
-                        sold_items.pop(0)
-                    INVENTORY[dragged_index] = None
+                if item.get('is_trash'):
+                    if TRASH_AREA.colliderect(item['rect']):
+                        INVENTORY[dragged_index] = None
+                    else:
+                        item['rect'].topleft = INVENTORY_SLOTS[dragged_index].topleft
                 else:
-                    item['rect'].topleft = INVENTORY_SLOTS[dragged_index].topleft
+                    if SELL_AREA.colliderect(item['rect']):
+                        total_money += item['value']
+                        sold_items.append((item['name'], item['value']))
+                        if len(sold_items) > 5:
+                            sold_items.pop(0)
+                        INVENTORY[dragged_index] = None
+                    else:
+                        item['rect'].topleft = INVENTORY_SLOTS[dragged_index].topleft
                 dragged_index = None
 
         # Update dragged item position
@@ -160,7 +175,14 @@ def main():
 
         # Drawing
         SCREEN.fill((30, 30, 30))
-        pygame.draw.rect(SCREEN, (150, 0, 0), SELL_AREA, 2)
+        pygame.draw.rect(SCREEN, (0, 150, 0), SELL_AREA, 2)
+        pygame.draw.rect(SCREEN, (150, 0, 0), TRASH_AREA, 2)
+        sell_text = info_font.render('Sell', True, (0, 150, 0))
+        sell_rect = sell_text.get_rect(center=SELL_AREA.center)
+        SCREEN.blit(sell_text, sell_rect)
+        trash_text = info_font.render('Trash', True, (150, 0, 0))
+        trash_rect = trash_text.get_rect(center=TRASH_AREA.center)
+        SCREEN.blit(trash_text, trash_rect)
         for slot in INVENTORY_SLOTS:
             pygame.draw.rect(SCREEN, (200, 200, 200), slot, 2)
         mouse_pos = pygame.mouse.get_pos()
@@ -168,11 +190,26 @@ def main():
         tooltip_rect = None
         for item in INVENTORY:
             if item:
-                if item.get('image'):
+                if item.get('is_trash'):
+                    pygame.draw.line(
+                        SCREEN,
+                        (255, 0, 0),
+                        item['rect'].topleft,
+                        item['rect'].bottomright,
+                        3,
+                    )
+                    pygame.draw.line(
+                        SCREEN,
+                        (255, 0, 0),
+                        item['rect'].topright,
+                        item['rect'].bottomleft,
+                        3,
+                    )
+                elif item.get('image'):
                     SCREEN.blit(item['image'], item['rect'])
                 else:
                     pygame.draw.rect(SCREEN, item['color'], item['rect'])
-                if item['rect'].collidepoint(mouse_pos):
+                if item['rect'].collidepoint(mouse_pos) and not item.get('is_trash'):
                     tooltip = info_font.render(
                         f"{item['name']} - ${item['value']}", True, (255, 255, 255)
                     )
