@@ -53,10 +53,10 @@ ITEMS = [
         'image': load_item_image('ring.png'),
     },
     {
-        'name': 'Potion',
+        'name': 'Portal Potion',
         'color': (148, 0, 211),
-        'value': 40,
-        'image': load_item_image('potion.png'),
+        'value': 150,
+        'image': load_item_image('portalpotion.png'),
     },
     {
         'name': 'Scroll',
