@@ -104,6 +104,8 @@ INVENTORY_SLOTS = [
 ]
 INVENTORY = [None] * INVENTORY_SIZE
 
+sell_sound = pygame.mixer.Sound("sounds/cashregisterfake.mp3")
+
 def spawn_item():
     """Add a random item (or trash) to the first available inventory slot."""
     for i in range(INVENTORY_SIZE):
@@ -147,6 +149,7 @@ def main():
             elif event.type == pygame.MOUSEBUTTONUP and dragged_index is not None:
                 item = INVENTORY[dragged_index]
                 if SELL_AREA.colliderect(item['rect']):
+                    sell_sound.play()
                     total_money += item['value']
                     sold_items.append((item['name'], item['value']))
                     if len(sold_items) > 5:
