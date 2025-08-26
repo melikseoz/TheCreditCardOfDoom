@@ -84,10 +84,10 @@ ITEMS = [
         'image': load_item_image('helmet.png'),
     },
     {
-        'name': 'Boots',
+        'name': 'Fabric of the Universe',
         'color': (139, 69, 19),
-        'value': 25,
-        'image': load_item_image('boots.png'),
+        'value': 1000,
+        'image': load_item_image('fabricoftheuniverse.png'),
     },
     {
         'name': 'Amulet',
